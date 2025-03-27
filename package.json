@@ -1,0 +1,24 @@
+{
+  "name": "license-checker",
+  "version": "1.0.0",
+  "description": "Projet de vérification de licence de l'App Clients Oiseaux",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rabledocteur/license-checker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/rabledocteur/license-checker/issues"
+  },
+  "homepage": "https://github.com/rabledocteur/license-checker#readme"
+}
