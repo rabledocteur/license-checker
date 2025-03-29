@@ -57,6 +57,27 @@ app.post('/checkLicense', async (req, res) => {
   }
 });
 
+app.post('/actionSensible', (req, res) => {
+  const authHeader = req.headers['authorization'];
+  
+  if (!authHeader) {
+    return res.status(401).json({ message: "Token manquant." });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    jwt.verify(token, SECRET_KEY);
+    
+    // ✅ Token valide
+    res.json({ message: "Action réalisée avec succès !" });
+
+  } catch (err) {
+    return res.status(401).json({ message: "Token invalide ou expiré." });
+  }
+});
+
+
 app.listen(port, '0.0.0.0', () => {
   console.log(`Serveur démarré sur le port ${port}`);
 });
