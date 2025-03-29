@@ -45,17 +45,6 @@ app.post('/checkLicense', async (req, res) => {
   }
 });
 
-// Test de connexion à Supabase
-(async () => {
-  console.log("Test de connexion à Supabase...");
-  const { data, error } = await supabase.from('licences').select('*');
-  if (error) {
-    console.error("Erreur lors de la connexion à Supabase :", error);
-  } else {
-    console.log("Connexion à Supabase réussie. Exemples de licences :", data);
-  }
-})();
-
 // Démarrer le serveur en écoutant sur toutes les interfaces
 app.listen(port, '0.0.0.0', () => {
   console.log(`Serveur démarré sur le port ${port}`);
