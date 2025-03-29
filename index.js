@@ -40,7 +40,7 @@ app.post('/checkLicense', async (req, res) => {
 
     // ✅ Génération du JWT sécurisé
     const token = jwt.sign(
-      { licenseKey, exp: Math.floor(Date.now() / 1000) + (5 * 60) }, // 5 minutes de validité
+      { licenseKey, exp: Math.floor(Date.now() / 1000) + (60 * 60) }, // validité 1h
       SECRET_KEY
     );
 
