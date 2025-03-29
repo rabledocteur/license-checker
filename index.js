@@ -4,59 +4,50 @@ const { createClient } = require('@supabase/supabase-js');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Remplace ces valeurs par celles de ton projet Supabase
+// Configuration Supabase
 const supabaseUrl = 'https://kusrbhhojsbibclikjpa.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1c3JiaGhvanNiaWJjbGlranBhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MzA5NzAzNCwiZXhwIjoyMDU4NjczMDM0fQ.3mLYftk8CFi0tBsy09jMR7MehKdkSPTZ3cnbfcWRDmk';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 app.use(express.json());
 
-// Endpoint pour vérifier la licence
+// Endpoint de vérification de licence
 app.post('/checkLicense', async (req, res) => {
   const { licenseKey } = req.body;
+  
   if (!licenseKey) {
-    return res.status(400).json({ valid: false, message: 'Clé de licence manquante' });
+    return res.status(400).json({ valid: false, message: 'Clé de licence manquante.' });
   }
 
   try {
-    // Requête sur la table 'licences'
     const { data, error } = await supabase
       .from('licences')
       .select('*')
-      .eq('key', licenseKey)
+      .eq('license_key', licenseKey)
       .single();
 
     if (error) {
       return res.status(500).json({ valid: false, message: error.message });
     }
     if (!data) {
-      return res.status(404).json({ valid: false, message: 'Licence non trouvée' });
+      return res.status(404).json({ valid: false, message: 'Licence non trouvée.' });
     }
 
+    // Vérification de la licence selon son type
     const now = new Date();
-    const expirationDate = new Date(data.expiration);
-    if (expirationDate < now) {
-      return res.status(400).json({ valid: false, message: 'Licence expirée' });
+    const expirationDate = new Date(data.expiration_date);
+
+    if (data.type !== 'LT' && expirationDate < now) {
+      return res.status(400).json({ valid: false, message: 'Licence expirée.' });
     }
 
-    res.json({ valid: true, message: 'Licence valide' });
+    res.json({ valid: true, message: 'Licence valide.', type: data.type, expiration_date: data.expiration_date });
+
   } catch (err) {
-    res.status(500).json({ valid: false, message: 'Erreur serveur' });
+    res.status(500).json({ valid: false, message: 'Erreur serveur.' });
   }
 });
 
-// Test de connexion à Supabase
-(async () => {
-  console.log("Test de connexion à Supabase...");
-  const { data, error } = await supabase.from('licences').select('*');
-  if (error) {
-    console.error("Erreur lors de la connexion à Supabase :", error);
-  } else {
-    console.log("Connexion à Supabase réussie. Exemples de licences :", data);
-  }
-})();
-
-// Démarrer le serveur en écoutant sur toutes les interfaces
 app.listen(port, '0.0.0.0', () => {
   console.log(`Serveur démarré sur le port ${port}`);
 });
