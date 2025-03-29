@@ -23,7 +23,7 @@ app.post('/checkLicense', async (req, res) => {
     const { data, error } = await supabase
       .from('licences')
       .select('*')
-      .eq('key', licenseKey)
+      .eq('license_key', licenseKey)
       .single();
 
     if (error) {
