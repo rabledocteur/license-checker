@@ -1,36 +1,61 @@
-// index.js
-const express = require("express");
-const app = express();
-const PORT = process.env.PORT || 3000;
+const express = require('express');
+const { createClient } = require('@supabase/supabase-js');
 
-// Pour accepter du JSON dans le body des requêtes
+const app = express();
+const port = process.env.PORT || 3000;
+
+// Remplace ces valeurs par celles de ton projet Supabase
+const supabaseUrl = 'https://kusrbhhojsbibclikjpa.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1c3JiaGhvanNiaWJjbGlranBhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MzA5NzAzNCwiZXhwIjoyMDU4NjczMDM0fQ.3mLYftk8CFi0tBsy09jMR7MehKdkSPTZ3cnbfcWRDmk';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 app.use(express.json());
 
-// Exemple d'une route GET pour tester
-app.get("/", (req, res) => {
-  res.send("Hello from License Checker!");
-});
-
-// Route POST /check-license
-// (on attend un body avec { licenseKey: "CO-1Y-xxx-..." })
-app.post("/check-license", (req, res) => {
+// Endpoint pour vérifier la licence
+app.post('/checkLicense', async (req, res) => {
   const { licenseKey } = req.body;
-
-  // Ici tu feras ta logique de vérification
-  // (ex: comparer à une base, vérifier date expiration, etc.)
-  // Pour l’instant, simulons une réponse :
   if (!licenseKey) {
-    return res.status(400).json({ valid: false, reason: "No licenseKey provided" });
+    return res.status(400).json({ valid: false, message: 'Clé de licence manquante' });
   }
 
-  // Exemple bidon : si la clé contient "ABCD" on dit valide, sinon non
-  if (licenseKey.includes("ABCD")) {
-    return res.json({ valid: true, message: "License valid" });
-  } else {
-    return res.json({ valid: false, reason: "Invalid key" });
+  try {
+    // Requête sur la table 'licences'
+    const { data, error } = await supabase
+      .from('licences')
+      .select('*')
+      .eq('key', licenseKey)
+      .single();
+
+    if (error) {
+      return res.status(500).json({ valid: false, message: error.message });
+    }
+    if (!data) {
+      return res.status(404).json({ valid: false, message: 'Licence non trouvée' });
+    }
+
+    const now = new Date();
+    const expirationDate = new Date(data.expiration);
+    if (expirationDate < now) {
+      return res.status(400).json({ valid: false, message: 'Licence expirée' });
+    }
+
+    res.json({ valid: true, message: 'Licence valide' });
+  } catch (err) {
+    res.status(500).json({ valid: false, message: 'Erreur serveur' });
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`License Checker API listening on port ${PORT}`);
+// Test de connexion à Supabase
+(async () => {
+  console.log("Test de connexion à Supabase...");
+  const { data, error } = await supabase.from('licences').select('*');
+  if (error) {
+    console.error("Erreur lors de la connexion à Supabase :", error);
+  } else {
+    console.log("Connexion à Supabase réussie. Exemples de licences :", data);
+  }
+})();
+
+app.listen(port, () => {
+  console.log(`Serveur démarré sur le port ${port}`);
 });
