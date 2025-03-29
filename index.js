@@ -56,6 +56,7 @@ app.post('/checkLicense', async (req, res) => {
   }
 })();
 
-app.listen(port, () => {
+// Démarrer le serveur en écoutant sur toutes les interfaces
+app.listen(port, '0.0.0.0', () => {
   console.log(`Serveur démarré sur le port ${port}`);
 });
