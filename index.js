@@ -1,3 +1,20 @@
+const express = require('express');
+const { createClient } = require('@supabase/supabase-js');
+const jwt = require('jsonwebtoken');
+
+const app = express(); // ← CETTE LIGNE EST ESSENTIELLE
+
+const port = process.env.PORT || 3000;
+
+const supabaseUrl = 'https://kusrbhhojsbibclikjpa.supabase.co';
+const supabaseKey = 'eyJh...WRDmk';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+const SECRET_KEY = 'Clients_Oiseaux_RabbyTech2025!';
+
+app.use(express.json());
+
+
 app.post('/checkLicense', async (req, res) => {
   const { licenseKey, version } = req.body;
 
