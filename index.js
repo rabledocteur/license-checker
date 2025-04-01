@@ -34,7 +34,7 @@ app.post('/checkLicense', async (req, res) => {
     }
 
     // ✅ Vérification de la version
-    if (data.version !== version) {
+    if ((data.Version || '').toLowerCase() !== version.toLowerCase()) {
       return res.status(403).json({ valid: false, message: 'Cette licence ne correspond pas à cette version du workflow.' });
     }
 
