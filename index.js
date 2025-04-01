@@ -16,7 +16,9 @@ const SECRET_KEY = 'Clients_Oiseaux_RabbyTech2025!';
 app.use(express.json());
 
 app.post('/checkLicense', async (req, res) => {
-  const { licenseKey, version } = req.body;
+  const { licenseKey } = req.body;
+  const version = "pro"; // codé en dur
+
 
   if (!licenseKey || !version) {
     return res.status(400).json({ valid: false, message: 'Clé de licence ou version manquante.' });
@@ -34,7 +36,7 @@ app.post('/checkLicense', async (req, res) => {
     }
 
     // ✅ Vérification de la version
-    if ((data.Version || '').toLowerCase() !== version.toLowerCase()) {
+    if (data.version !== version) {
       return res.status(403).json({ valid: false, message: 'Cette licence ne correspond pas à cette version du workflow.' });
     }
 
