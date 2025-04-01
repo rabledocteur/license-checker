@@ -14,7 +14,6 @@ const SECRET_KEY = 'Clients_Oiseaux_RabbyTech2025!';
 
 app.use(express.json());
 
-
 app.post('/checkLicense', async (req, res) => {
   const { licenseKey, version } = req.body;
 
