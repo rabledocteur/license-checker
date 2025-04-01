@@ -15,7 +15,6 @@ const SECRET_KEY = 'Clients_Oiseaux_RabbyTech2025!';
 
 app.use(express.json());
 
-// 🔑 Route de vérification de licence
 app.post('/checkLicense', async (req, res) => {
   const { licenseKey, version } = req.body;
 
@@ -34,8 +33,9 @@ app.post('/checkLicense', async (req, res) => {
       return res.status(404).json({ valid: false, message: 'Licence non trouvée.' });
     }
 
+    // ✅ Vérification de la version
     if (data.version !== version) {
-      return res.status(403).json({ valid: false, message: 'Licence invalide pour cette version.' });
+      return res.status(403).json({ valid: false, message: 'Cette licence ne correspond pas à cette version du workflow.' });
     }
 
     const now = new Date();
@@ -45,9 +45,12 @@ app.post('/checkLicense', async (req, res) => {
       return res.status(400).json({ valid: false, message: 'Licence expirée.' });
     }
 
-    // ✅ Création du token JWT temporaire
     const token = jwt.sign(
-      { licenseKey, version, exp: Math.floor(Date.now() / 1000) + (60 * 60) },
+      {
+        licenseKey,
+        version,
+        exp: Math.floor(Date.now() / 1000) + (60 * 60),
+      },
       SECRET_KEY
     );
 
@@ -56,11 +59,10 @@ app.post('/checkLicense', async (req, res) => {
       message: 'Licence valide.',
       type: data.type,
       expiration_date: data.expiration_date,
-      token
+      token,
     });
 
   } catch (err) {
-    console.error(err);
     res.status(500).json({ valid: false, message: 'Erreur serveur.' });
   }
 });
